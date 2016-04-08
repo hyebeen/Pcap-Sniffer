@@ -2,10 +2,20 @@
 #include <stdio.h>
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet);
-void ethernet(u_char *packet, int a, int b);
-void ip(const u_char *packet, int a, int b);
-void tcp(const u_char *packet, int a, int b);
-void tcp(const u_char *packet, int a, int b);
+void ethernet(u_char *packet);
+void ip(const u_char *packet);
+void tcp(const u_char *packet);
+void tcp(const u_char *packet);
+
+/*IP헤더위치 = Ethernet헤더위치+sizeof(Ethernet헤더) // IP헤더위치라는 정보를 위해서 별도의 포인터 변수(예 : ip_hdr)를 선언해서 사용할 것
+Protocol field를 access하기 위해서는 IP헤더위치 + 9 를 이용
+Source IP field를 access하기 위해서는 IP헤더위치 + 12 를 이용
+Destination IP field를 access하기 위해서는 IP헤더위치 + 16 를 이용
+*/
+int ether_hdr = 0;
+int ip_hdr = ether_hdr+14;
+int tcp_hdr = ip_hdr+20;
+int udp_hdr = ip_hdr+20;
 
 int main()
 {
@@ -33,72 +43,72 @@ int main()
     return(0);
 }
 
-void ethernet(const u_char *packet, int a, int b)
+void ethernet(const u_char *packet)
 {
     int sm, dm;
     printf("destination mac      -> ");
-    for(dm=0; dm<=a; dm++) {
+    for(dm=ether_hdr; dm<=ether_hdr+5; dm++) {
           printf("%02x",packet[dm]);
-          if(dm!=a)
+          if(dm!=ether_hdr+5)
                printf(":");
     }
     printf("\t");
     printf("source mac           -> ");
-    for(sm=a+1; sm<=b; sm++) {
+    for(sm=ether_hdr+6; sm<=ether_hdr+11; sm++) {
           printf("%02x",packet[sm]);
-          if(sm!=b)
+          if(sm!=ether_hdr+11)
                printf(":");
     }
     printf("\n");
 
 }
 
-void ip(const u_char *packet, int a, int b)
+void ip(const u_char *packet)
 {
     int si, di;
     printf("source IP            -> ");
-    for(si=26; si<=a; si++) {
+    for(si=ip_hdr+12; si<=ip_hdr+15; si++) {
           printf("%02d",packet[si]);
-          if(si!=a)
+          if(si!=ip_hdr+15)
                printf(".");
     }
     printf("\t");
     printf("        destination IP       -> ");
-    for(di=a+1; di<=b; di++) {
+    for(di=ip_hdr+16; di<=ip_hdr+19; di++) {
           printf("%02d",packet[di]);
-          if(di!=b)
+          if(di!=ip_hdr+19)
                printf(".");
     }
     printf("\n");
 
 }
 
-void tcp(const u_char *packet, int a, int b)
+void tcp(const u_char *packet)
 {
     int sp, dp;
     printf("tcp source port      -> ");
-    for(sp=34; sp<=a; sp++) {
+    for(sp=tcp_hdr; sp<=tcp_hdr+1; sp++) {
           printf("%02d",packet[sp]);
     }
     printf("\t");
     printf("                tcp destination port -> ");
-    for(dp=a+1; dp<=b; dp++) {
+    for(dp=tcp_hdr+2; dp<=tcp_hdr+3; dp++) {
           printf("%02d",packet[dp]);
 
     }
     printf("\n");
 }
 
-void udp(const u_char *packet, int a, int b)
+void udp(const u_char *packet)
 {
     int sp, dp;
     printf("udp source port      -> ");
-    for(sp=34; sp<=a; sp++) {
+    for(sp=udp_hdr; sp<=udp_hdr+1; sp++) {
           printf("%02d",packet[sp]);
     }
     printf("\t");
     printf("                udp destination port -> ");
-    for(dp=a+1; dp<=b; dp++) {
+    for(dp=udp_hdr+2; dp<=udp_hdr+3; dp++) {
           printf("%02d",packet[dp]);
 
     }
@@ -107,11 +117,11 @@ void udp(const u_char *packet, int a, int b)
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
 {
-    ethernet(packet, 5, 11);
-    if(packet[12]==8 && packet[13]==0)
-        ip(packet, 29, 33);
-    if(packet[23]==6)
-        tcp(packet, 35, 37);
-    if (packet[23]==17)
-        udp(packet, 35, 37);
+    ethernet(packet);
+    if(packet[ether_hdr+12]==8 && packet[ether_hdr+13]==0)
+        ip(packet);
+    if(packet[ip_hdr+9]==6)
+        tcp(packet);
+    if (packet[ip_hdr+9]==17)
+        udp(packet);
 }
