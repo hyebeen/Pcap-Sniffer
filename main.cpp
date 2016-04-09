@@ -38,77 +38,74 @@ int main()
 void ethernet(const u_char *packet)
 {
     int sm, dm;
-
-    printf("destination mac      -> ");
+    printf("===================ethernet====================\n");
+    printf("\ndestination mac -> ");
     for(dm=ether_hdr; dm<=ether_hdr+5; dm++) {
           printf("%02x",packet[dm]);
           if(dm!=ether_hdr+5)
                printf(":");
     }
 
-    printf("\t");
-    printf("source mac           -> ");
+
+    printf("\n\nsource mac -> ");
     for(sm=ether_hdr+6; sm<=ether_hdr+11; sm++) {
           printf("%02x",packet[sm]);
           if(sm!=ether_hdr+11)
                printf(":");
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 void ip(const u_char *packet)
 {
     int si, di;
-
-    printf("source IP            -> ");
+    printf("=======================IP=======================\n");
+    printf("\nsource IP -> ");
     for(si=ip_hdr+12; si<=ip_hdr+15; si++) {
           printf("%02d",packet[si]);
           if(si!=ip_hdr+15)
                printf(".");
     }
 
-    printf("\t");
-    printf("        destination IP       -> ");
+    printf("\n\ndestination IP -> ");
     for(di=ip_hdr+16; di<=ip_hdr+19; di++) {
           printf("%02d",packet[di]);
           if(di!=ip_hdr+19)
                printf(".");
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 void tcp(const u_char *packet)
 {
     int sp, dp;
-
-    printf("tcp source port      -> ");
+    printf("======================TCP=======================\n");
+    printf("\nsource port -> ");
     for(sp=tcp_hdr; sp<=tcp_hdr+1; sp++) {
           printf("%02d",packet[sp]);
     }
 
-    printf("\t");
-    printf("                tcp destination port -> ");
+    printf("\n\ndestination port -> ");
     for(dp=tcp_hdr+2; dp<=tcp_hdr+3; dp++) {
           printf("%02d",packet[dp]);
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 void udp(const u_char *packet)
 {
     int sp, dp;
-
-    printf("udp source port      -> ");
+    printf("======================UDP======================\n");
+    printf("\nsource port -> ");
     for(sp=udp_hdr; sp<=udp_hdr+1; sp++) {
           printf("%02d",packet[sp]);
     }
 
-    printf("\t");
-    printf("                udp destination port -> ");
+    printf("\n\ndestination port -> ");
     for(dp=udp_hdr+2; dp<=udp_hdr+3; dp++) {
           printf("%02d",packet[dp]);
     }
-    printf("\n");
+    printf("\n\n");
 }
 
 void got_packet(u_char *args, const struct pcap_pkthdr *header, const u_char *packet)
