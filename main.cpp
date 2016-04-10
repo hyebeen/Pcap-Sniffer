@@ -15,11 +15,10 @@ int udp_hdr = ip_hdr+20;
 int main()
 {
     pcap_t *handle;
-    char *dev;
+    char *dev = "wlan1";
     char errbuf[PCAP_ERRBUF_SIZE];
     bpf_u_int32 mask;
     bpf_u_int32 net;
-    dev = "wlan1";
     if (pcap_lookupnet(dev, &net, &mask, errbuf) == -1) {
         fprintf(stderr, "Couldn't get netmask for device %s: %s\n", dev, errbuf);
         net = 0;
@@ -41,17 +40,15 @@ void ethernet(const u_char *packet)
     printf("===================ethernet====================\n");
     printf("\ndestination mac -> ");
     for(dm=ether_hdr; dm<=ether_hdr+5; dm++) {
-          printf("%02x",packet[dm]);
-          if(dm!=ether_hdr+5)
-               printf(":");
+        printf("%02x",packet[dm]);
+        if(dm!=ether_hdr+5)
+            printf(":");
     }
-
-
     printf("\n\nsource mac -> ");
     for(sm=ether_hdr+6; sm<=ether_hdr+11; sm++) {
           printf("%02x",packet[sm]);
           if(sm!=ether_hdr+11)
-               printf(":");
+              printf(":");
     }
     printf("\n\n");
 }
@@ -66,7 +63,6 @@ void ip(const u_char *packet)
           if(si!=ip_hdr+15)
                printf(".");
     }
-
     printf("\n\ndestination IP -> ");
     for(di=ip_hdr+16; di<=ip_hdr+19; di++) {
           printf("%02d",packet[di]);
